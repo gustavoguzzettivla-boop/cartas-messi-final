@@ -4,7 +4,7 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 
 export default defineConfig({
   plugins: [
-    TanStackRouterVite(), // Nombre corregido. Sigue siendo obligatorio para tu estructura.
+    TanStackRouterVite(),
     react(),
   ],
 });
