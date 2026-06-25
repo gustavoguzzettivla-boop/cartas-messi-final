@@ -1,0 +1,5 @@
+name = "cartas-messi-final"
+pages_build_output_dir = ".output/public"
+
+[build]
+command = "npm run build"
