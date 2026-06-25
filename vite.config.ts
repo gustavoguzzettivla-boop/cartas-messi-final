@@ -1,17 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { tanStackStartVitePlugin } from "@tanstack/react-start-plugin/vite";
 
 export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    tsconfigPaths: true,
-  },
-  // Forzamos a Vite a mirar la carpeta 'src' para encontrar la lógica
-  // y a ignorar el index.html tradicional.
-  build: {
-    rollupOptions: {
-      // Intentamos apuntar al archivo donde tu app realmente inicia
-      input: "./src/main.tsx" 
-    }
-  }
+  plugins: [
+    tanStackStartVitePlugin(), // Este plugin es obligatorio para tu estructura
+    react(),
+  ],
 });
