@@ -1,17 +1,13 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    tsconfigPaths: true,
-  },
-  // Forzamos a Vite a mirar la carpeta 'src' para encontrar la lógica
-  // y a ignorar el index.html tradicional.
-  build: {
-    rollupOptions: {
-      // Intentamos apuntar al archivo donde tu app realmente inicia
-      input: "./src/main.tsx" 
-    }
-  }
-});
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cartas Messi</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
