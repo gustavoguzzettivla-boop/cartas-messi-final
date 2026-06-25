@@ -1,4 +1,4 @@
-compatibility_date = "2026-06-25"
+name = "cartas-messi-final"compatibility_date = "2026-06-25"
 
 [assets]
 directory = "./dist"
