@@ -1,6 +1,10 @@
 {
   "version": 2,
-  "framework": "vite",
   "buildCommand": "npm run build",
-  "outputDirectory": ".output"
+  "outputDirectory": ".vercel/output",
+  "routes": [
+    { "src": "/_vercel/insights/(.*)", "dest": "/_vercel/insights/$1" },
+    { "src": "/assets/(.*)", "dest": "/dist/client/assets/$1" },
+    { "src": "/(.*)", "dest": "/" }
+  ]
 }
