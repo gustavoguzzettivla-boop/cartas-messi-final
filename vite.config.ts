@@ -1,9 +1,10 @@
 import { defineConfig } from "vite";
-import config from "@lovable.dev/vite-tanstack-config";
+import { tanstackViteConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   plugins: [
-    config({
+    tanstackViteConfig({
+      // Esto le dice a Vite cómo manejar el servidor de TanStack Start
       tanstackStart: {
         server: { entry: "server" }
       }
