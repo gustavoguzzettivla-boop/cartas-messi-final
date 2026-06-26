@@ -16,31 +16,38 @@ export function LetterCard({
     <Link
       to="/cartas/$id"
       params={{ id: letter.id }}
-      className="group flex h-full flex-col rounded-lg border border-border bg-card p-6 transition-shadow hover:shadow-sm"
+      className="group block w-full min-w-0 h-full rounded-lg border border-border bg-card p-6 transition-shadow hover:shadow-sm overflow-hidden"
     >
+      {/* location */}
       {location && (
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-0">
           {flag ? (
-            <span className="text-lg leading-none" aria-label={letter.country ?? ""}>
+            <span className="text-lg leading-none shrink-0" aria-label={letter.country ?? ""}>
               {flag}
             </span>
           ) : null}
-          <span>{location}</span>
+
+          <span className="truncate min-w-0">
+            {location}
+          </span>
         </div>
       )}
 
-      <h3 className="mt-3 font-serif text-2xl leading-tight text-foreground group-hover:underline">
+      {/* author */}
+      <h3 className="mt-3 font-serif text-2xl leading-tight text-foreground group-hover:underline break-words">
         {letter.author_name}
       </h3>
 
+      {/* date */}
       <p className="mt-1 text-xs text-muted-foreground">
         {formatDate(letter.created_at)}
       </p>
 
       <div className="my-4 h-px w-10 bg-border" />
 
+      {/* content */}
       <p
-        className={`text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap ${
+        className={`text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap break-words min-w-0 ${
           clamp ? "line-clamp-5" : ""
         }`}
       >

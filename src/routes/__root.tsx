@@ -21,8 +21,8 @@ import { Toaster } from "@/components/ui/sonner";
 function NotFoundComponent() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background px-4">
-      <div className="text-center max-w-md">
-        <h1 className="text-6xl font-bold text-foreground">404</h1>
+      <div className="text-center max-w-md w-full">
+        <h1 className="text-6xl font-bold">404</h1>
         <p className="mt-2 text-muted-foreground">Página no encontrada</p>
 
         <Link
@@ -56,12 +56,9 @@ function ErrorComponent({
   }, [error]);
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center">
-      <div className="text-center max-w-md">
-        <h1 className="text-xl font-semibold text-foreground">
-          Algo salió mal
-        </h1>
-
+    <div className="min-h-screen w-full flex items-center justify-center px-4">
+      <div className="text-center max-w-md w-full">
+        <h1 className="text-xl font-semibold">Algo salió mal</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Error inesperado en la aplicación
         </p>
@@ -101,20 +98,21 @@ export const Route = createRootRouteWithContext<{
 });
 
 /* =========================
-   ROOT LAYOUT (ESTO ES CLAVE)
+   ROOT FIX REAL
 ========================= */
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* 🔥 ESTE WRAPPER ES EL QUE ARREGLA EL "TODO DE COSTADO" */}
-      <div className="min-h-screen w-full flex flex-col overflow-x-hidden">
+      <div className="w-full min-h-screen overflow-x-hidden flex flex-col">
         <SiteHeader />
 
-        {/* 🔥 IMPORTANTE: main full width */}
-        <main className="flex-1 w-full">
-          <Outlet />
+        {/* 🔥 CLAVE REAL: ESTE WRAPPER EVITA “DE COSTADO” */}
+        <main className="flex-1 w-full min-w-0 overflow-x-hidden">
+          <div className="w-full max-w-full overflow-x-hidden">
+            <Outlet />
+          </div>
         </main>
 
         <SiteFooter />
@@ -134,7 +132,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
 
-      <body className="min-h-screen w-full bg-background text-foreground antialiased">
+      <body className="w-full min-h-screen overflow-x-hidden bg-background text-foreground antialiased">
         {children}
         <Scripts />
       </body>
