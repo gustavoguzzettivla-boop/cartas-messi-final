@@ -70,32 +70,41 @@ function AdminRoute() {
   }, [filterStatus, isAuthenticated]);
 
   const handleStatusChange = async (id: string, status: "pending" | "approved" | "rejected") => {
+    setLoading(true);
     try {
       await adminSetStatus({ data: { password, id, status } });
       if (expandedLetterId === id) setExpandedLetterId(null);
-      loadLetters();
+      await loadLetters();
     } catch (err: any) {
       alert("Error: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleFeaturedChange = async (id: string, featured: boolean) => {
+    setLoading(true);
     try {
       await adminSetFeatured({ data: { password, id, featured } });
-      loadLetters();
+      await loadLetters();
     } catch (err: any) {
       alert("Error: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Seguro que quieres eliminar permanentemente esta carta?")) return;
+    setLoading(true);
     try {
       await adminDeleteLetter({ data: { password, id } });
       if (expandedLetterId === id) setExpandedLetterId(null);
-      loadLetters();
+      await loadLetters();
     } catch (err: any) {
       alert("Error: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -185,97 +194,4 @@ function AdminRoute() {
                   <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
                     <strong style={{ minWidth: "140px" }}>{letter.author_name}</strong>
                     <span style={{ color: "#666", fontSize: "14px" }}>
-                      {letter.city ? `${letter.city}, ` : ""}{letter.country || "País no especificado"}
-                    </span>
-                    <span style={{ color: "#999", fontSize: "12px" }}>
-                      {new Date(letter.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div>
-                    <button 
-                      style={{ 
-                        padding: "4px 10px", 
-                        fontSize: "13px", 
-                        borderRadius: "4px", 
-                        border: "1px solid #aaa",
-                        background: isExpanded ? "#ddd" : "#fff",
-                        cursor: "pointer" 
-                      }}
-                    >
-                      {isExpanded ? "▲ Cerrar" : "▼ Ver contenido"}
-                    </button>
-                  </div>
-                </div>
-
-                {/* TEXTO QUE SE EXPANDE AL HACER CLIC */}
-                {isExpanded && (
-                  <div style={{ padding: "16px", borderTop: "1px solid #eee", background: "#fff" }}>
-                    <p style={{ 
-                      whiteSpace: "pre-wrap", 
-                      fontSize: "15px", 
-                      lineHeight: "1.6", 
-                      color: "#333",
-                      background: "#f5f5f5",
-                      padding: "15px",
-                      borderRadius: "4px",
-                      margin: "0 0 15px 0"
-                    }}>
-                      {letter.content}
-                    </p>
-
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        {letter.status !== "approved" && (
-                          <button 
-                            onClick={() => handleStatusChange(letter.id, "approved")}
-                            style={{ padding: "6px 12px", background: "#2e7d32", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
-                          >
-                            ✓ Aprobar
-                          </button>
-                        )}
-                        {letter.status !== "rejected" && (
-                          <button 
-                            onClick={() => handleStatusChange(letter.id, "rejected")}
-                            style={{ padding: "6px 12px", background: "#d32f2f", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}
-                          >
-                            ✕ Rechazar
-                          </button>
-                        )}
-                        {letter.status !== "pending" && (
-                          <button 
-                            onClick={() => handleStatusChange(letter.id, "pending")}
-                            style={{ padding: "6px 12px", background: "#f57c00", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}
-                          >
-                            Volver a Pendiente
-                          </button>
-                        )}
-                      </div>
-
-                      <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-                        <label style={{ fontSize: "14px", display: "flex", alignItems: "center", gap: "5px", cursor: "pointer" }}>
-                          <input 
-                            type="checkbox" 
-                            checked={letter.featured} 
-                            onChange={(e) => handleFeaturedChange(letter.id, e.target.checked)}
-                          />
-                          Destacada
-                        </label>
-
-                        <button 
-                          onClick={() => handleDelete(letter.id)}
-                          style={{ padding: "6px 12px", background: "none", color: "#cc0000", border: "1px solid #cc0000", borderRadius: "4px", cursor: "pointer" }}
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
+                      {letter.city ? `${letter.city}, ` : ""}{letter.country || "Pa

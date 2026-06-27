@@ -107,13 +107,11 @@ function RootComponent() {
         
         {/* =========================================================
             FONDO QUE SCROLLEA Y MÁS DESVANECIDO: 
-            Al usar "absolute top-0", la imagen empieza arriba pero 
-            sube naturalmente cuando haces scroll hacia abajo.
-            La opacidad bajó a 40 para que sea más sutil.
+            Agrandamos la imagen con max-w-[1400px] y scale-[1.15]
         ========================================================= */}
-        <div className="absolute top-0 left-0 right-0 z-0 pointer-events-none flex justify-center pt-20">
+        <div className="absolute top-0 left-0 right-0 z-0 pointer-events-none flex justify-center pt-20 overflow-hidden">
           <div 
-            className="w-full max-w-[1200px] h-[85vh] bg-[url('/fondo-messi.jpg')] bg-contain bg-top bg-no-repeat opacity-40"
+            className="w-full max-w-[1400px] h-[85vh] bg-[url('/fondo-messi.jpg')] bg-contain bg-top bg-no-repeat opacity-40 scale-[1.15]"
             style={{ 
               maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
               WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'

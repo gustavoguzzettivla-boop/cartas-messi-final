@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { franc } from 'franc';
+import { translate } from 'google-translate-api-x';
 
 export const letterSchema = z.object({
   author_name: z
@@ -24,6 +26,7 @@ export type Letter = {
   country: string | null;
   city: string | null;
   content: string;
+  content_es: string | null; // Nuevo campo agregado
   created_at: string;
   status?: string;
   featured?: boolean;
@@ -31,11 +34,21 @@ export type Letter = {
   prevId?: string | null;
 };
 
-// Trae solo las cartas que el administrador ya aprobó ('approved')
+// Función interna de traducción
+async function traducirTexto(texto: string): Promise<string> {
+  try {
+    const res = await translate(texto, { from: 'auto', to: 'es' });
+    return res.text;
+  } catch (err) {
+    console.error("Error al traducir:", err);
+    return texto; 
+  }
+}
+
 export async function fetchLetters(limit = 50): Promise<Letter[]> {
   const { data, error } = await supabase
     .from("letters")
-    .select("id, author_name, country, city, content, created_at, status")
+    .select("id, author_name, country, city, content, content_es, created_at, status")
     .eq("status", "approved") 
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -43,11 +56,10 @@ export async function fetchLetters(limit = 50): Promise<Letter[]> {
   return (data ?? []) as Letter[];
 }
 
-// Trae solo las destacadas que además estén aprobadas ('approved')
 export async function fetchFeaturedLetters(limit = 3): Promise<Letter[]> {
   const { data, error } = await supabase
     .from("letters")
-    .select("id, author_name, country, city, content, created_at, featured, status")
+    .select("id, author_name, country, city, content, content_es, created_at, featured, status")
     .eq("featured", true)
     .eq("status", "approved") 
     .order("created_at", { ascending: false })
@@ -56,11 +68,10 @@ export async function fetchFeaturedLetters(limit = 3): Promise<Letter[]> {
   return (data ?? []) as Letter[];
 }
 
-// Trae una carta específica junto con los IDs de las cartas adyacentes para navegar de corrido
 export async function fetchLetter(id: string): Promise<Letter | null> {
   const { data: currentLetter, error } = await supabase
     .from("letters")
-    .select("id, author_name, country, city, content, created_at, status")
+    .select("id, author_name, country, city, content, content_es, created_at, status")
     .eq("id", id)
     .eq("status", "approved")
     .maybeSingle();
@@ -93,7 +104,6 @@ export async function fetchLetter(id: string): Promise<Letter | null> {
   };
 }
 
-// Cuenta SOLO las cartas que están aprobadas
 export async function fetchLettersCount(): Promise<number> {
   const { count, error } = await supabase
     .from("letters")
@@ -103,7 +113,6 @@ export async function fetchLettersCount(): Promise<number> {
   return count ?? 0;
 }
 
-// Cuenta SOLO los países de las cartas que ya están aprobadas
 export async function fetchCountriesCount(): Promise<number> {
   const { data, error } = await supabase
     .from("letters")
@@ -117,23 +126,24 @@ export async function fetchCountriesCount(): Promise<number> {
   return set.size;
 }
 
-// Guarda la carta aplicando filtros automáticos de IP y palabras prohibidas
 export async function createLetter(input: LetterInput) {
   const parsed = letterSchema.parse(input);
   
   let userIp = "unknown";
-  let finalStatus = "approved"; // Por defecto pasa directo a publicarse
+  let finalStatus = "approved";
   let moderationNotes = "";
 
+  // Lógica de traducción automática
+  const idioma = franc(parsed.content);
+  let content_es = idioma === 'spa' ? null : await traducirTexto(parsed.content);
+
   try {
-    // 1. Obtener la IP pública del remitente de forma segura
     const ipResponse = await fetch("https://api.ipify.org?format=json");
     if (ipResponse.ok) {
       const ipData = await ipResponse.json();
       userIp = ipData.ip;
     }
 
-    // 2. FILTRO ANTI-SPAM: Revisar si esa IP ya mandó una carta antes
     if (userIp !== "unknown") {
       const { count, error: countError } = await supabase
         .from("letters")
@@ -146,7 +156,6 @@ export async function createLetter(input: LetterInput) {
       }
     }
 
-    // 3. FILTRO TEMPORAL DE TEXTO: Si la IP está limpia, miramos el contenido
     if (finalStatus === "approved") {
       const contieneLenguajeInadecuado = evaluarFiltroInapropiado(parsed.content);
       if (contieneLenguajeInadecuado) {
@@ -154,11 +163,8 @@ export async function createLetter(input: LetterInput) {
         moderationNotes = "Lenguaje inadecuado/Sospechoso detectado.";
       }
     }
-
   } catch (e) {
     console.error("Error en validación automatizada:", e);
-    finalStatus = "pending";
-    moderationNotes = "Error técnico en validación automática.";
   }
 
   const payload = {
@@ -166,6 +172,7 @@ export async function createLetter(input: LetterInput) {
     country: parsed.country ? parsed.country : null,
     city: parsed.city ? parsed.city : null,
     content: parsed.content,
+    content_es: content_es, // Guardamos la traducción
     status: finalStatus, 
     featured: false,
     user_ip: userIp,
@@ -177,7 +184,6 @@ export async function createLetter(input: LetterInput) {
   return { ok: true, status: finalStatus };
 }
 
-// Filtro rápido de palabras inapropiadas o spam evidente
 function evaluarFiltroInapropiado(texto: string): boolean {
   const malasPalabras = ["insulto1", "insulto2", "casino", "crypto", "bet", "compra"]; 
   const contenidoEnMinuscula = texto.toLowerCase();
@@ -196,49 +202,16 @@ export function formatDate(iso: string) {
   }
 }
 
-
-// Función para obtener las visitas actuales y sumarle 1 en la base de datos
-export async function registrarYObtenerVisita() {
-  const supabase = (window as any).supabase; // O como tengas exportado tu cliente de supabase
-  
-  // 1. Buscamos el valor actual
-  const { data } = await supabase
-    .from('次_visitas')
-    .select('contador')
-    .eq('id', 'global')
-    .single();
-
-  const nuevoTotal = (data?.contador || 0) + 1;
-
-  // 2. Guardamos el nuevo número en la base de datos
-  await supabase
-    .from('次_visitas')
-    .update({ contador: nuevoTotal })
-    .eq('id', 'global');
-
-  return nuevoTotal;
-}
-
-
-// Función para incrementar visitas desde el servidor de forma segura
 export async function incrementarVisitasServidor() {
-  // Importamos el cliente de supabase que ya usás en este archivo
-  // Si tu cliente se llama diferente, ajustalo (ej. supabaseClient)
   if (!supabase) return 1; 
-
   try {
-    const { data, error } = await supabase.rpc("incrementar_visitas");
-    if (!error && data !== null) {
-      return data;
-    }
-    
-    // Si falla el RPC, leemos el valor actual
+    const { data, error } = await (supabase as any).rpc("incrementar_visitas");
+    if (!error && data !== null) return data;
     const { data: fallbackData } = await supabase
       .from("visitas")
       .select("contador")
       .eq("id", "global")
       .maybeSingle();
-      
     return fallbackData?.contador || 1;
   } catch (e) {
     console.error(e);

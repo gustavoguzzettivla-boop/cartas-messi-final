@@ -46,13 +46,31 @@ export function LetterCard({
       <div className="my-4 h-px w-10 bg-border" />
 
       {/* content */}
-      <p
-        className={`text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap break-words min-w-0 ${
-          clamp ? "line-clamp-5" : ""
-        }`}
-      >
-        {letter.content}
-      </p>
+      <div className="space-y-4">
+        <p
+          className={`text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap break-words min-w-0 ${
+            clamp ? "line-clamp-5" : ""
+          }`}
+        >
+          {letter.content}
+        </p>
+
+        {/* Traducción automática si existe y es distinta */}
+        {letter.content_es && letter.content_es !== letter.content && (
+          <div className="pt-4 border-t border-gray-100">
+            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">
+              Traducción al español:
+            </p>
+            <p
+              className={`text-sm leading-relaxed text-gray-600 italic whitespace-pre-wrap break-words min-w-0 ${
+                clamp ? "line-clamp-3" : ""
+              }`}
+            >
+              {letter.content_es}
+            </p>
+          </div>
+        )}
+      </div>
     </Link>
   );
 }

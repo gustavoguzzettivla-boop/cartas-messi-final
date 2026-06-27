@@ -1,19 +1,12 @@
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { franc } from 'franc';
 
 export const letterSchema = z.object({
-  author_name: z
-    .string()
-    .trim()
-    .min(1, "Tu nombre no puede estar vacío")
-    .max(80, "Máximo 80 caracteres"),
+  author_name: z.string().trim().min(1, "Tu nombre no puede estar vacío").max(80, "Máximo 80 caracteres"),
   country: z.string().trim().max(60).optional().or(z.literal("")),
   city: z.string().trim().max(60).optional().or(z.literal("")),
-  content: z
-    .string()
-    .trim()
-    .min(10, "Tu carta es demasiado corta (mínimo 10 caracteres)")
-    .max(20000, "Tu carta es demasiado larga (máximo 20000 caracteres)"),
+  content: z.string().trim().min(10, "Tu carta es demasiado corta (mínimo 10 caracteres)").max(20000, "Tu carta es demasiado larga (máximo 20000 caracteres)"),
 });
 
 export type LetterInput = z.infer<typeof letterSchema>;
@@ -24,6 +17,7 @@ export type Letter = {
   country: string | null;
   city: string | null;
   content: string;
+  content_es: string | null; // Nuevo campo agregado
   created_at: string;
   status?: string;
   featured?: boolean;
@@ -34,7 +28,7 @@ export type Letter = {
 export async function fetchLetters(limit = 50): Promise<Letter[]> {
   const { data, error } = await supabase
     .from("letters")
-    .select("id, author_name, country, city, content, created_at, status")
+    .select("id, author_name, country, city, content, content_es, created_at, status")
     .eq("status", "approved") 
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -45,7 +39,7 @@ export async function fetchLetters(limit = 50): Promise<Letter[]> {
 export async function fetchFeaturedLetters(limit = 3): Promise<Letter[]> {
   const { data, error } = await supabase
     .from("letters")
-    .select("id, author_name, country, city, content, created_at, featured, status")
+    .select("id, author_name, country, city, content, content_es, created_at, featured, status")
     .eq("featured", true)
     .eq("status", "approved") 
     .order("created_at", { ascending: false })
@@ -57,7 +51,7 @@ export async function fetchFeaturedLetters(limit = 3): Promise<Letter[]> {
 export async function fetchLetter(id: string): Promise<Letter | null> {
   const { data: currentLetter, error } = await supabase
     .from("letters")
-    .select("id, author_name, country, city, content, created_at, status")
+    .select("id, author_name, country, city, content, content_es, created_at, status")
     .eq("id", id)
     .eq("status", "approved")
     .maybeSingle();
@@ -119,6 +113,10 @@ export async function createLetter(input: LetterInput) {
   let finalStatus = "approved";
   let moderationNotes = "";
 
+  // Detección inicial de idioma
+  const idioma = franc(parsed.content);
+  let content_es = idioma === 'spa' ? parsed.content : null;
+
   try {
     const ipResponse = await fetch("https://api.ipify.org?format=json");
     if (ipResponse.ok) {
@@ -153,13 +151,13 @@ export async function createLetter(input: LetterInput) {
     country: parsed.country ? parsed.country : null,
     city: parsed.city ? parsed.city : null,
     content: parsed.content,
+    content_es: content_es, // Campo nuevo
     status: finalStatus, 
     featured: false,
     user_ip: userIp,
     moderation_notes: moderationNotes
   };
 
-  // Usamos 'as any' aquí para evitar conflictos con el esquema de Supabase generado
   const { error } = await (supabase.from("letters") as any).insert(payload);
   if (error) throw error;
   return { ok: true, status: finalStatus };
@@ -185,19 +183,13 @@ export function formatDate(iso: string) {
 
 export async function incrementarVisitasServidor() {
   if (!supabase) return 1; 
-
   try {
-    // Usamos 'any' para evitar errores de tipo en la RPC y la tabla que no están en el esquema
     const { data, error } = await (supabase as any).rpc("incrementar_visitas");
-    if (!error && data !== null) {
-      return data;
-    }
-    
+    if (!error && data !== null) return data;
     const { data: fallbackData } = await (supabase.from("letters") as any)
       .select("contador")
       .eq("id", "global")
       .maybeSingle();
-      
     return fallbackData?.contador || 1;
   } catch (e) {
     console.error(e);

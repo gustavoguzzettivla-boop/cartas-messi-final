@@ -14,15 +14,20 @@ export function SiteHeader() {
           UNA CARTA PARA MESSI
         </Link>
 
-        {/* Navegación central (Desktop) */}
+        {/* Navegación central (Desktop) - Rutas corregidas */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
           <Link to="/" className="hover:text-black transition-colors">Inicio</Link>
-          <Link to="/leer" className="hover:text-black transition-colors">Leer cartas</Link>
+          
+          {/* Apunta a /cartas porque tu archivo es cartas.index.tsx */}
+          <Link to="/cartas" className="hover:text-black transition-colors">Leer cartas</Link>
+          
           <Link to="/escribir" className="hover:text-black transition-colors">Escribir carta</Link>
-          <Link to="/sobre-el-proyecto" className="hover:text-black transition-colors">Sobre el proyecto</Link>
+          
+          {/* Apunta a /sobre porque tu archivo es sobre.tsx */}
+          <Link to="/sobre" className="hover:text-black transition-colors">Sobre el proyecto</Link>
         </nav>
 
-        {/* Botón Escribir a la derecha (Igual al principal) */}
+        {/* Botón Escribir a la derecha */}
         <div className="flex items-center">
           <Link 
             to="/escribir" 

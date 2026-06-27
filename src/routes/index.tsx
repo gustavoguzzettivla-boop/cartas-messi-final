@@ -43,22 +43,21 @@ function Index() {
   return (
     <div className="flex flex-col min-h-screen">
       
-      {/* 1. HERO SECTION - Imagen más grande y márgenes ajustados */}
-      <section className="relative pt-8 pb-16">
+      {/* 1. HERO SECTION */}
+      <section className="relative pt-1 pb-16">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-          {/* Max-w-2xl permite que el texto respire pero no sea tan angosto */}
-          <div className="max-w-2xl space-y-6">
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 font-serif leading-none">
+          <div className="max-w-lg space-y-5">
+            <h1 className="text-4xl md:text-[3.5rem] font-bold tracking-tight text-gray-900 font-serif leading-none">
               UNA CARTA<br />PARA MESSI
             </h1>
             
-            <div className="w-16 h-[2px] bg-gray-400 mt-8 mb-6"></div>
+            <div className="w-12 h-[2px] bg-gray-400 mt-6 mb-4"></div>
             
-            <p className="text-xl text-gray-700 leading-relaxed">
+            <p className="text-lg text-gray-700 leading-relaxed font-medium">
               Un archivo abierto donde cualquier persona puede dejar una carta para Lionel Messi.
             </p>
             
-            <div className="space-y-1 text-lg text-gray-900 font-medium py-2">
+            <div className="space-y-1 text-base text-gray-900 font-medium py-2">
               <p>Miles de historias.</p>
               <p>Miles de agradecimientos.</p>
               <p>Un solo lugar.</p>
@@ -67,9 +66,9 @@ function Index() {
             <div className="pt-2">
               <Link 
                 to="/escribir" 
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0f1115] text-white rounded-md font-medium hover:bg-black transition-colors shadow-lg"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#0f1115] text-white rounded-md text-sm font-medium hover:bg-black transition-colors shadow-sm"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 20h9"></path>
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                 </svg>
@@ -77,15 +76,15 @@ function Index() {
               </Link>
             </div>
             
-            <p className="text-xs text-gray-500 uppercase tracking-widest pt-4 font-semibold">
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest pt-4 font-bold">
               CON AMOR, DESDE TODO EL MUNDO.
             </p>
           </div>
         </div>
       </section>
 
-      {/* 2. STATS SECTION - Más compacta */}
-      <section className="border-y border-gray-200/60 bg-white/40 py-6 my-4">
+      {/* 2. STATS SECTION */}
+      <section className="border-y border-gray-200/60 bg-gray-50/50 py-6 my-4">
         <div className="mx-auto grid max-w-4xl gap-6 px-4 sm:grid-cols-3">
           <Stat icon={<Mail className="h-4 w-4" />} value={total} label="cartas publicadas" />
           <Stat icon={<Globe className="h-4 w-4" />} value={countries} label="países representados" />
@@ -93,7 +92,7 @@ function Index() {
         </div>
       </section>
 
-      {/* 3. CARTAS DESTACADAS Y ÚLTIMAS CARTAS - Cards más chicas */}
+      {/* 3. CARTAS */}
       <div className="mx-auto w-full max-w-7xl px-4 py-8 space-y-12">
         {featuredLetters.length > 0 && (
           <section>
@@ -101,7 +100,6 @@ function Index() {
               <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
               <h2 className="font-serif text-2xl text-gray-900">Cartas Destacadas</h2>
             </div>
-            {/* Grid más chico con gap reducido */}
             <div className="grid gap-4 md:grid-cols-3">
               {featuredLetters.map((letter) => (
                 <div key={letter.id} className="scale-90 origin-left">
@@ -128,6 +126,45 @@ function Index() {
           </div>
         </section>
       </div>
+
+      {/* 4. ¿CÓMO FUNCIONA? - Versión compacta */}
+      <section className="py-12 bg-gray-50 border-t border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="font-serif text-2xl mb-10 text-gray-900">¿Cómo funciona?</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="flex flex-col items-center">
+              <div className="mb-4 w-16 h-16 bg-white rounded-full flex items-center justify-center border border-gray-200 text-gray-700 shadow-sm">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </div>
+              <div className="font-bold text-sm mb-1 flex items-center gap-2">
+                <span className="bg-black text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">1</span>
+                Escribí tu carta
+              </div>
+              <p className="text-xs text-gray-500 px-4 leading-relaxed">Contá tu historia, dejá tu mensaje.</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="mb-4 w-16 h-16 bg-white rounded-full flex items-center justify-center border border-gray-200 text-gray-700 shadow-sm">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              </div>
+              <div className="font-bold text-sm mb-1 flex items-center gap-2">
+                <span className="bg-black text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">2</span>
+                Nosotros la revisamos
+              </div>
+              <p className="text-xs text-gray-500 px-4 leading-relaxed">Mantenemos el respeto antes de publicar.</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="mb-4 w-16 h-16 bg-white rounded-full flex items-center justify-center border border-gray-200 text-gray-700 shadow-sm">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </div>
+              <div className="font-bold text-sm mb-1 flex items-center gap-2">
+                <span className="bg-black text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">3</span>
+                La publicamos
+              </div>
+              <p className="text-xs text-gray-500 px-4 leading-relaxed">Ya es parte del archivo mundial.</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
