@@ -26,7 +26,7 @@ export type Letter = {
   country: string | null;
   city: string | null;
   content: string;
-  content_es: string | null; // Nuevo campo agregado
+  content_es: string | null;
   created_at: string;
   status?: string;
   featured?: boolean;
@@ -98,7 +98,7 @@ export async function fetchLetter(id: string): Promise<Letter | null> {
     .maybeSingle();
 
   return {
-    ...(currentLetter as Letter),
+    ...(currentLetter as any),
     nextId: nextData?.id || null,
     prevId: prevData?.id || null,
   };
@@ -133,7 +133,6 @@ export async function createLetter(input: LetterInput) {
   let finalStatus = "approved";
   let moderationNotes = "";
 
-  // Lógica de traducción automática
   const idioma = franc(parsed.content);
   let content_es = idioma === 'spa' ? null : await traducirTexto(parsed.content);
 
@@ -172,14 +171,14 @@ export async function createLetter(input: LetterInput) {
     country: parsed.country ? parsed.country : null,
     city: parsed.city ? parsed.city : null,
     content: parsed.content,
-    content_es: content_es, // Guardamos la traducción
+    content_es: content_es,
     status: finalStatus, 
     featured: false,
     user_ip: userIp,
     moderation_notes: moderationNotes
   };
 
-  const { error } = await supabase.from("letters").insert(payload);
+  const { error } = await supabase.from("letters").insert(payload as any);
   if (error) throw error;
   return { ok: true, status: finalStatus };
 }
