@@ -4,18 +4,10 @@ import { franc } from 'franc';
 import { translate } from 'google-translate-api-x';
 
 export const letterSchema = z.object({
-  author_name: z
-    .string()
-    .trim()
-    .min(1, "Tu nombre no puede estar vacío")
-    .max(80, "Máximo 80 caracteres"),
+  author_name: z.string().trim().min(1, "Tu nombre no puede estar vacío").max(80),
   country: z.string().trim().max(60).optional().or(z.literal("")),
   city: z.string().trim().max(60).optional().or(z.literal("")),
-  content: z
-    .string()
-    .trim()
-    .min(10, "Tu carta es demasiado corta (mínimo 10 caracteres)")
-    .max(5000, "Tu carta es demasiado larga (máximo 5000 caracteres)"),
+  content: z.string().trim().min(10, "Tu carta es demasiado corta").max(5000),
 });
 
 export type LetterInput = z.infer<typeof letterSchema>;
@@ -34,7 +26,6 @@ export type Letter = {
   prevId?: string | null;
 };
 
-// Función interna de traducción
 async function traducirTexto(texto: string): Promise<string> {
   try {
     const res = await translate(texto, { from: 'auto', to: 'es' });
@@ -46,18 +37,18 @@ async function traducirTexto(texto: string): Promise<string> {
 }
 
 export async function fetchLetters(limit = 50): Promise<Letter[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("letters")
     .select("id, author_name, country, city, content, content_es, created_at, status")
     .eq("status", "approved") 
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return (data ?? []) as Letter[];
+  return (data as unknown as Letter[]) ?? [];
 }
 
 export async function fetchFeaturedLetters(limit = 3): Promise<Letter[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("letters")
     .select("id, author_name, country, city, content, content_es, created_at, featured, status")
     .eq("featured", true)
@@ -65,11 +56,11 @@ export async function fetchFeaturedLetters(limit = 3): Promise<Letter[]> {
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return (data ?? []) as Letter[];
+  return (data as unknown as Letter[]) ?? [];
 }
 
 export async function fetchLetter(id: string): Promise<Letter | null> {
-  const { data: currentLetter, error } = await supabase
+  const { data: currentLetter, error } = await (supabase as any)
     .from("letters")
     .select("id, author_name, country, city, content, content_es, created_at, status")
     .eq("id", id)
@@ -79,7 +70,7 @@ export async function fetchLetter(id: string): Promise<Letter | null> {
   if (error) throw error;
   if (!currentLetter) return null;
 
-  const { data: nextData } = await supabase
+  const { data: nextData } = await (supabase as any)
     .from("letters")
     .select("id")
     .eq("status", "approved")
@@ -88,7 +79,7 @@ export async function fetchLetter(id: string): Promise<Letter | null> {
     .limit(1)
     .maybeSingle();
 
-  const { data: prevData } = await supabase
+  const { data: prevData } = await (supabase as any)
     .from("letters")
     .select("id")
     .eq("status", "approved")
@@ -98,14 +89,14 @@ export async function fetchLetter(id: string): Promise<Letter | null> {
     .maybeSingle();
 
   return {
-    ...(currentLetter as any),
+    ...(currentLetter as unknown as Letter),
     nextId: nextData?.id || null,
     prevId: prevData?.id || null,
   };
 }
 
 export async function fetchLettersCount(): Promise<number> {
-  const { count, error } = await supabase
+  const { count, error } = await (supabase as any)
     .from("letters")
     .select("*", { count: "exact", head: true })
     .eq("status", "approved"); 
@@ -114,21 +105,20 @@ export async function fetchLettersCount(): Promise<number> {
 }
 
 export async function fetchCountriesCount(): Promise<number> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("letters")
     .select("country")
     .eq("status", "approved") 
     .not("country", "is", null);
   if (error) throw error;
   const set = new Set(
-    (data ?? []).map((r) => (r.country ?? "").trim().toLowerCase()).filter(Boolean),
+    (data ?? []).map((r: any) => (r.country ?? "").trim().toLowerCase()).filter(Boolean),
   );
   return set.size;
 }
 
 export async function createLetter(input: LetterInput) {
   const parsed = letterSchema.parse(input);
-  
   let userIp = "unknown";
   let finalStatus = "approved";
   let moderationNotes = "";
@@ -144,14 +134,14 @@ export async function createLetter(input: LetterInput) {
     }
 
     if (userIp !== "unknown") {
-      const { count, error: countError } = await supabase
+      const { count, error: countError } = await (supabase as any)
         .from("letters")
         .select("*", { count: "exact", head: true })
         .eq("user_ip", userIp);
 
       if (!countError && count && count > 0) {
         finalStatus = "pending";
-        moderationNotes = "IP repetida. Requiere revisión manual.";
+        moderationNotes = "IP repetida.";
       }
     }
 
@@ -159,46 +149,28 @@ export async function createLetter(input: LetterInput) {
       const contieneLenguajeInadecuado = evaluarFiltroInapropiado(parsed.content);
       if (contieneLenguajeInadecuado) {
         finalStatus = "pending";
-        moderationNotes = "Lenguaje inadecuado/Sospechoso detectado.";
+        moderationNotes = "Lenguaje inadecuado.";
       }
     }
   } catch (e) {
-    console.error("Error en validación automatizada:", e);
+    console.error(e);
   }
 
-  const payload = {
-    author_name: parsed.author_name,
-    country: parsed.country ? parsed.country : null,
-    city: parsed.city ? parsed.city : null,
-    content: parsed.content,
-    content_es: content_es,
-    status: finalStatus, 
-    featured: false,
-    user_ip: userIp,
-    moderation_notes: moderationNotes
-  };
-
-  const { error } = await supabase.from("letters").insert(payload as any);
+  const payload = { ...parsed, content_es, status: finalStatus, featured: false, user_ip: userIp, moderation_notes: moderationNotes };
+  const { error } = await (supabase as any).from("letters").insert(payload);
   if (error) throw error;
   return { ok: true, status: finalStatus };
 }
 
 function evaluarFiltroInapropiado(texto: string): boolean {
   const malasPalabras = ["insulto1", "insulto2", "casino", "crypto", "bet", "compra"]; 
-  const contenidoEnMinuscula = texto.toLowerCase();
-  return malasPalabras.some(palabra => contenidoEnMinuscula.includes(palabra));
+  return malasPalabras.some(palabra => texto.toLowerCase().includes(palabra));
 }
 
 export function formatDate(iso: string) {
   try {
-    return new Date(iso).toLocaleDateString("es-AR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  } catch {
-    return iso;
-  }
+    return new Date(iso).toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
+  } catch { return iso; }
 }
 
 export async function incrementarVisitasServidor() {
@@ -206,11 +178,7 @@ export async function incrementarVisitasServidor() {
   try {
     const { data, error } = await (supabase as any).rpc("incrementar_visitas");
     if (!error && data !== null) return data;
-    const { data: fallbackData } = await supabase
-      .from("visitas")
-      .select("contador")
-      .eq("id", "global")
-      .maybeSingle();
+    const { data: fallbackData } = await (supabase as any).from("visitas").select("contador").eq("id", "global").maybeSingle();
     return fallbackData?.contador || 1;
   } catch (e) {
     console.error(e);
