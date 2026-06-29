@@ -19,31 +19,55 @@ export type Database = {
           author_name: string
           city: string | null
           content: string
+          content_es: string | null
           country: string | null
           created_at: string
           featured: boolean
           id: string
+          moderation_notes: string | null
           status: string
+          user_ip: string | null
         }
         Insert: {
           author_name: string
           city?: string | null
           content: string
+          content_es?: string | null
           country?: string | null
           created_at?: string
           featured?: boolean
           id?: string
+          moderation_notes?: string | null
           status?: string
+          user_ip?: string | null
         }
         Update: {
           author_name?: string
           city?: string | null
           content?: string
+          content_es?: string | null
           country?: string | null
           created_at?: string
           featured?: boolean
           id?: string
+          moderation_notes?: string | null
           status?: string
+          user_ip?: string | null
+        }
+        Relationships: []
+      }
+      visitas: {
+        Row: {
+          contador: number | null
+          id: string
+        }
+        Insert: {
+          contador?: number | null
+          id: string
+        }
+        Update: {
+          contador?: number | null
+          id?: string
         }
         Relationships: []
       }
@@ -52,7 +76,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      incrementar_visitas: { Args: never; Returns: number }
+      puede_enviar_carta: { Args: { ip: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
