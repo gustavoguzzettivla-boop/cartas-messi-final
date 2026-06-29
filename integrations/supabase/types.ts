@@ -7,8 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
@@ -19,47 +17,48 @@ export type Database = {
           author_name: string
           city: string | null
           content: string
+          content_es: string | null
           country: string | null
           created_at: string
           featured: boolean
           id: string
+          moderation_notes: string | null
           status: string
+          user_ip: string | null
         }
         Insert: {
           author_name: string
           city?: string | null
           content: string
+          content_es?: string | null
           country?: string | null
           created_at?: string
           featured?: boolean
           id?: string
+          moderation_notes?: string | null
           status?: string
+          user_ip?: string | null
         }
         Update: {
           author_name?: string
           city?: string | null
           content?: string
+          content_es?: string | null
           country?: string | null
           created_at?: string
           featured?: boolean
           id?: string
+          moderation_notes?: string | null
           status?: string
+          user_ip?: string | null
         }
         Relationships: []
       }
     }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+    Views: { [_ in never]: never }
+    Functions: { [_ in never]: never }
+    Enums: { [_ in never]: never }
+    CompositeTypes: { [_ in never]: never }
   }
 }
 

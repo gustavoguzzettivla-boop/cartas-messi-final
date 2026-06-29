@@ -17,12 +17,13 @@ export type Letter = {
   country: string | null;
   city: string | null;
   content: string;
+  content_es?: string | null;
   created_at: string;
   status?: string;
   featured?: boolean;
   nextId?: string | null;
   prevId?: string | null;
-  user_ip?: string;
+  user_ip?: string | null;
   moderation_notes?: string | null;
 };
 
@@ -32,9 +33,12 @@ const LETTER_SELECT = `
   country,
   city,
   content,
+  content_es,
   created_at,
   status,
-  featured
+  featured,
+  user_ip,
+  moderation_notes
 `;
 
 export async function fetchLetters(limit = 50): Promise<Letter[]> {
