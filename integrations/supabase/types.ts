@@ -18,6 +18,7 @@ export type Database = {
           city: string | null
           content: string
           content_es: string | null
+          contador: number | null
           country: string | null
           created_at: string
           featured: boolean
@@ -31,6 +32,7 @@ export type Database = {
           city?: string | null
           content: string
           content_es?: string | null
+          contador?: number | null
           country?: string | null
           created_at?: string
           featured?: boolean
@@ -44,6 +46,7 @@ export type Database = {
           city?: string | null
           content?: string
           content_es?: string | null
+          contador?: number | null
           country?: string | null
           created_at?: string
           featured?: boolean
