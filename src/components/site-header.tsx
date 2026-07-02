@@ -100,3 +100,23 @@ export function SiteHeader() {
     </header>
   );
 }
+
+
+{open && (
+  <div className="md:hidden absolute top-[72px] left-0 w-full bg-white border-b shadow-lg flex flex-col gap-4 p-5 z-50">
+    
+    <Link to="/" onClick={() => setOpen(false)}>Inicio</Link>
+    <Link to="/cartas" onClick={() => setOpen(false)}>Leer cartas</Link>
+    <Link to="/escribir" onClick={() => setOpen(false)}>Escribir carta</Link>
+    <Link to="/sobre" onClick={() => setOpen(false)}>Sobre el proyecto</Link>
+
+    <Link
+      to="/escribir"
+      onClick={() => setOpen(false)}
+      className="mt-2 bg-black text-white px-4 py-2 rounded-md text-center"
+    >
+      Escribir una carta
+    </Link>
+
+  </div>
+)}
