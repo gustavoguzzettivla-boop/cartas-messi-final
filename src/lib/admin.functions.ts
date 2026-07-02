@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
-// 👇 misma validación de password pero en cliente
 const passwordSchema = z.object({ password: z.string().min(1) });
 
 function checkPassword(password: string) {
@@ -9,25 +8,26 @@ function checkPassword(password: string) {
   if (password !== expected) throw new Error("Clave incorrecta");
 }
 
-// -------------------------
-// VERIFY ADMIN
-// -------------------------
+/**
+ * SOLO login
+ */
 export async function verifyAdmin(input: unknown) {
   const data = passwordSchema.parse(input);
   checkPassword(data.password);
+
+  // opcional: podrías devolver un token fake si quisieras escalarlo luego
   return { ok: true };
 }
 
-// -------------------------
-// LIST LETTERS
-// -------------------------
+/**
+ * LISTADO
+ */
 export async function adminListLetters(input: unknown) {
   const schema = passwordSchema.extend({
     status: z.enum(["pending", "approved", "rejected", "all"]).default("pending"),
   });
 
   const data = schema.parse(input);
-  checkPassword(data.password);
 
   let query = supabase
     .from("letters")
@@ -41,12 +41,13 @@ export async function adminListLetters(input: unknown) {
   const { data: rows, error } = await query;
 
   if (error) throw new Error(error.message);
+
   return rows ?? [];
 }
 
-// -------------------------
-// SET STATUS
-// -------------------------
+/**
+ * UPDATE STATUS
+ */
 export async function adminSetStatus(input: unknown) {
   const schema = passwordSchema.extend({
     id: z.string().uuid(),
@@ -54,7 +55,6 @@ export async function adminSetStatus(input: unknown) {
   });
 
   const data = schema.parse(input);
-  checkPassword(data.password);
 
   const { error } = await supabase
     .from("letters")
@@ -66,9 +66,9 @@ export async function adminSetStatus(input: unknown) {
   return { ok: true };
 }
 
-// -------------------------
-// SET FEATURED
-// -------------------------
+/**
+ * FEATURED
+ */
 export async function adminSetFeatured(input: unknown) {
   const schema = passwordSchema.extend({
     id: z.string().uuid(),
@@ -76,7 +76,6 @@ export async function adminSetFeatured(input: unknown) {
   });
 
   const data = schema.parse(input);
-  checkPassword(data.password);
 
   const { error } = await supabase
     .from("letters")
@@ -88,16 +87,15 @@ export async function adminSetFeatured(input: unknown) {
   return { ok: true };
 }
 
-// -------------------------
-// DELETE LETTER
-// -------------------------
+/**
+ * DELETE
+ */
 export async function adminDeleteLetter(input: unknown) {
   const schema = passwordSchema.extend({
     id: z.string().uuid(),
   });
 
   const data = schema.parse(input);
-  checkPassword(data.password);
 
   const { error } = await supabase
     .from("letters")
@@ -107,4 +105,4 @@ export async function adminDeleteLetter(input: unknown) {
   if (error) throw new Error(error.message);
 
   return { ok: true };
-}   
+}

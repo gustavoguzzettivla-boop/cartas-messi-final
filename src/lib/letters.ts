@@ -134,7 +134,7 @@ export async function createLetter(input: LetterInput) {
   const parsed = letterSchema.parse(input);
 
   let userIp = "unknown";
-  let finalStatus: "approved" | "pending" = "approved";
+  let finalStatus: "approved" | "pending" = "pending";
   let moderationNotes = "";
 
   const idioma = franc(parsed.content);
@@ -160,7 +160,7 @@ export async function createLetter(input: LetterInput) {
       }
     }
 
-    if (finalStatus === "approved") {
+    if (finalStatus === "pending") {
       const malas = evaluarFiltroInapropiado(parsed.content);
 
       if (malas) {
@@ -184,7 +184,9 @@ export async function createLetter(input: LetterInput) {
     content_es,
   };
 
-  const { error } = await (supabase as any).from("letters" as any).insert(payload);
+  const { error } = await (supabase as any)
+    .from("letters" as any)
+    .insert(payload);
 
   if (error) throw error;
 
@@ -192,7 +194,15 @@ export async function createLetter(input: LetterInput) {
 }
 
 function evaluarFiltroInapropiado(texto: string): boolean {
-  const malasPalabras = ["insulto1", "insulto2", "casino", "crypto", "bet", "compra"];
+  const malasPalabras = [
+    "insulto1",
+    "insulto2",
+    "casino",
+    "crypto",
+    "bet",
+    "compra"
+  ];
+
   const t = texto.toLowerCase();
   return malasPalabras.some((p) => t.includes(p));
 }
@@ -208,14 +218,13 @@ export function formatDate(iso: string) {
     return iso;
   }
 }
+
 export async function incrementarVisitasServidor() {
   try {
     const { data, error } = await (supabase as any).rpc("incrementar_visitas");
 
     if (!error && data !== null) return data;
 
-    // Aquí desconectamos a TypeScript por completo usando (supabase as any)
-    // y apuntando correctamente a la tabla "visitas"
     const { data: fallback } = await (supabase as any)
       .from("visitas")
       .select("contador")
