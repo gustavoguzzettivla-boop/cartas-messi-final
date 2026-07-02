@@ -134,13 +134,14 @@ export async function createLetter(input: LetterInput) {
   const parsed = letterSchema.parse(input);
 
   let userIp = "unknown";
-  let finalStatus: "approved" | "pending" = "pending";
+  let finalStatus: "approved" | "pending" = "approved";
   let moderationNotes = "";
 
   const idioma = franc(parsed.content);
   const content_es = idioma === "spa" ? parsed.content : null;
 
   try {
+    // 1. obtener IP
     const ipResponse = await fetch("https://api.ipify.org?format=json");
 
     if (ipResponse.ok) {
@@ -148,9 +149,10 @@ export async function createLetter(input: LetterInput) {
       userIp = ipData.ip;
     }
 
+    // 2. SOLO 1 CARTA POR IP
     if (userIp !== "unknown") {
       const { count, error: countError } = await (supabase as any)
-        .from("letters" as any)
+        .from("letters")
         .select("*", { count: "exact", head: true })
         .eq("user_ip", userIp);
 
@@ -160,12 +162,33 @@ export async function createLetter(input: LetterInput) {
       }
     }
 
-    if (finalStatus === "pending") {
-      const malas = evaluarFiltroInapropiado(parsed.content);
+    // 3. IA (SIEMPRE CORRE)
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "moderar-carta-ia",
+        {
+          body: { content: parsed.content },
+        }
+      );
 
-      if (malas) {
+      console.log("AI RESULT:", data);
+
+      if (!error && data) {
+        if (data.contieneLenguajeInadecuado) {
+          finalStatus = "pending";
+          moderationNotes =
+            data.motivo || "Lenguaje inapropiado detectado por IA.";
+        }
+      } else {
+        if (finalStatus === "approved") {
+          finalStatus = "pending";
+          moderationNotes = "Error en moderación IA (fallback seguro).";
+        }
+      }
+    } catch (e) {
+      if (finalStatus === "approved") {
         finalStatus = "pending";
-        moderationNotes = "Lenguaje inadecuado/Sospechoso detectado.";
+        moderationNotes = "Error al ejecutar IA.";
       }
     }
   } catch (e) {
@@ -185,26 +208,12 @@ export async function createLetter(input: LetterInput) {
   };
 
   const { error } = await (supabase as any)
-    .from("letters" as any)
+    .from("letters")
     .insert(payload);
 
   if (error) throw error;
 
   return { ok: true, status: finalStatus };
-}
-
-function evaluarFiltroInapropiado(texto: string): boolean {
-  const malasPalabras = [
-    "insulto1",
-    "insulto2",
-    "casino",
-    "crypto",
-    "bet",
-    "compra"
-  ];
-
-  const t = texto.toLowerCase();
-  return malasPalabras.some((p) => t.includes(p));
 }
 
 export function formatDate(iso: string) {
