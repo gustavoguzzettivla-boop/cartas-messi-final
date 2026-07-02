@@ -179,7 +179,6 @@ function AdminRoute() {
       </div>
     );
   }
-
   return (
     <div
       style={{
@@ -216,10 +215,8 @@ function AdminRoute() {
                   borderRadius: "4px",
                   border: "1px solid #ccc",
                   cursor: "pointer",
-                  background:
-                    filterStatus === status ? "#222" : "#fff",
-                  color:
-                    filterStatus === status ? "#fff" : "#222"
+                  background: filterStatus === status ? "#222" : "#fff",
+                  color: filterStatus === status ? "#fff" : "#222"
                 }}
               >
                 {status === "pending"
@@ -244,7 +241,12 @@ function AdminRoute() {
           {letters.map((letter) => (
             <div
               key={letter.id}
-              style={{ border: "1px solid #e1e1e1", borderRadius: "6px" }}
+              style={{
+                border: letter.featured
+                  ? "2px solid #d4af37"
+                  : "1px solid #e1e1e1",
+                borderRadius: "6px"
+              }}
             >
               <div
                 onClick={() => toggleExpand(letter.id)}
@@ -252,10 +254,34 @@ function AdminRoute() {
                   padding: "12px 16px",
                   cursor: "pointer",
                   display: "flex",
-                  justifyContent: "space-between"
+                  justifyContent: "space-between",
+                  alignItems: "center"
                 }}
               >
-                <strong>{letter.author_name}</strong>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px"
+                  }}
+                >
+                  <strong>{letter.author_name}</strong>
+
+                  {letter.featured && (
+                    <span
+                      style={{
+                        background: "#d4af37",
+                        color: "#fff",
+                        fontSize: "12px",
+                        padding: "2px 8px",
+                        borderRadius: "999px"
+                      }}
+                    >
+                      ⭐ Destacada
+                    </span>
+                  )}
+                </div>
+
                 <span>
                   {expandedLetterId === letter.id ? "▲ Cerrar" : "▼ Ver"}
                 </span>
@@ -276,7 +302,8 @@ function AdminRoute() {
                     style={{
                       display: "flex",
                       gap: "10px",
-                      marginTop: "10px"
+                      marginTop: "10px",
+                      flexWrap: "wrap"
                     }}
                   >
                     <button
@@ -309,6 +336,30 @@ function AdminRoute() {
                       }}
                     >
                       Rechazar
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        handleFeaturedChange(
+                          letter.id,
+                          !letter.featured
+                        )
+                      }
+                      style={{
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        backgroundColor: letter.featured
+                          ? "#f0ad4e"
+                          : "#ffc107",
+                        color: "#000",
+                        border: "none",
+                        borderRadius: "4px",
+                        fontWeight: "bold"
+                      }}
+                    >
+                      {letter.featured
+                        ? "✨ Quitar destacada"
+                        : "⭐ Destacar"}
                     </button>
 
                     <button
