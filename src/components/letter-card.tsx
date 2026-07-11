@@ -16,53 +16,57 @@ export function LetterCard({
     <Link
       to="/cartas/$id"
       params={{ id: letter.id }}
-      className="group block w-full min-w-0 h-full rounded-lg border border-border bg-card p-6 transition-shadow hover:shadow-sm overflow-hidden"
+      className="group block h-full w-full min-w-0 overflow-hidden rounded-xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md"
     >
-      {/* location */}
+      {/* Ubicación */}
       {location && (
-        <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-0">
+        <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
           {flag ? (
-            <span className="text-lg leading-none shrink-0" aria-label={letter.country ?? ""}>
+            <span
+              className="shrink-0 text-lg leading-none"
+              aria-label={letter.country ?? ""}
+            >
               {flag}
             </span>
           ) : null}
 
-          <span className="truncate min-w-0">
+          <span className="min-w-0 truncate">
             {location}
           </span>
         </div>
       )}
 
-      {/* author */}
-      <h3 className="mt-3 font-serif text-2xl leading-tight text-foreground group-hover:underline break-words">
+      {/* Autor */}
+      <h3 className="mt-3 break-words font-serif text-xl leading-tight text-foreground">
         {letter.author_name}
       </h3>
 
-      {/* date */}
-      <p className="mt-1 text-xs text-muted-foreground">
+      {/* Fecha */}
+      <p className="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">
         {formatDate(letter.created_at)}
       </p>
 
-      <div className="my-4 h-px w-10 bg-border" />
+      <div className="my-3 h-px w-8 bg-border" />
 
-      {/* content */}
+      {/* Contenido */}
       <div className="space-y-4">
         <p
-          className={`text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap break-words min-w-0 ${
-            clamp ? "line-clamp-5" : ""
+          className={`min-w-0 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/80 ${
+            clamp ? "line-clamp-4" : ""
           }`}
         >
           {letter.content}
         </p>
 
-        {/* Traducción automática si existe y es distinta */}
+        {/* Traducción automática */}
         {letter.content_es && letter.content_es !== letter.content && (
-          <div className="pt-4 border-t border-gray-100">
-            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">
-              Traducción al español:
+          <div className="border-t border-gray-100 pt-4">
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+              Traducción al español
             </p>
+
             <p
-              className={`text-sm leading-relaxed text-gray-600 italic whitespace-pre-wrap break-words min-w-0 ${
+              className={`min-w-0 whitespace-pre-wrap break-words text-sm italic leading-relaxed text-gray-600 ${
                 clamp ? "line-clamp-3" : ""
               }`}
             >
@@ -70,6 +74,13 @@ export function LetterCard({
             </p>
           </div>
         )}
+      </div>
+
+      <div className="mt-5 flex items-center text-sm font-medium text-muted-foreground transition-colors group-hover:text-foreground">
+        Leer carta
+        <span className="ml-1 transition-transform duration-200 group-hover:translate-x-1">
+          →
+        </span>
       </div>
     </Link>
   );
