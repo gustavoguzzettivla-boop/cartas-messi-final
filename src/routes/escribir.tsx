@@ -90,12 +90,17 @@ function EscribirPage() {
               {...form.register("author_name")}
             />
           </Field>
-          <Field label="País" error={form.formState.errors.country?.message}>
+
+          <Field
+            label="País"
+            error={form.formState.errors.country?.message}
+          >
             <Input
               placeholder="Ej. Argentina"
               {...form.register("country")}
             />
           </Field>
+
           <Field
             label="Ciudad"
             error={form.formState.errors.city?.message}
@@ -114,13 +119,17 @@ function EscribirPage() {
             error={form.formState.errors.content?.message}
             required
           >
+            <p className="mb-3 font-serif text-2xl text-foreground">
+              Querido Leo:
+            </p>
+
             <Textarea
               rows={12}
-              placeholder="Querido Leo..."
-              /* Cambiada la fuente a 'font-sans', subido el tamaño a 'text-xl' y mejorado el padding/tracking */
+              placeholder="Empezá a escribir tu carta..."
               className="font-sans text-xl leading-relaxed tracking-wide p-4"
               {...form.register("content")}
             />
+
             <div className="mt-1 flex justify-end text-xs text-muted-foreground">
               {content.length} / 20000
             </div>
@@ -131,6 +140,7 @@ function EscribirPage() {
           <p className="text-xs text-muted-foreground">
             Al enviar, tu carta queda pendiente de revisión antes de publicarse.
           </p>
+
           <Button
             type="submit"
             size="lg"
