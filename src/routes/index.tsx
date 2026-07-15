@@ -111,21 +111,38 @@ function Index() {
       <div className="mx-auto w-full max-w-7xl px-4 py-8 space-y-12">
 
         {featuredLetters.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-                <h2 className="font-serif text-2xl text-gray-900">
-                  Cartas Destacadas
-                </h2>
+          <section className="rounded-2xl bg-gray-50 border border-gray-200 p-6 sm:p-8">
+
+            <div className="flex items-center justify-between mb-8">
+
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+
+                  <h2 className="font-serif text-3xl text-gray-900">
+                    Cartas Destacadas
+                  </h2>
+                </div>
+
+                <p className="text-sm text-gray-500">
+                  Algunas historias que merecen ser recordadas.
+                </p>
               </div>
+
             </div>
 
+
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+
               {featuredLetters.map((letter) => (
-                <LetterCard key={letter.id} letter={letter} />
+                <LetterCard
+                  key={letter.id}
+                  letter={letter}
+                />
               ))}
+
             </div>
+
           </section>
         )}
         <section>
