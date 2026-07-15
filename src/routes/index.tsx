@@ -128,6 +128,12 @@ function Index() {
                   Algunas historias que merecen ser recordadas.
                 </p>
               </div>
+              <Link
+    to="/destacadas"
+    className="flex items-center gap-1 text-sm text-gray-600 hover:text-black transition-colors font-medium"
+  >
+    Ver todas <ArrowRight className="h-4 w-4" />
+  </Link>
 
             </div>
 

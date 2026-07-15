@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as EscribirRouteImport } from './routes/escribir'
+import { Route as DestacadasRouteImport } from './routes/destacadas'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CartasIndexRouteImport } from './routes/cartas.index'
@@ -24,6 +25,11 @@ const SobreRoute = SobreRouteImport.update({
 const EscribirRoute = EscribirRouteImport.update({
   id: '/escribir',
   path: '/escribir',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DestacadasRoute = DestacadasRouteImport.update({
+  id: '/destacadas',
+  path: '/destacadas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -50,6 +56,7 @@ const CartasIdRoute = CartasIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/destacadas': typeof DestacadasRoute
   '/escribir': typeof EscribirRoute
   '/sobre': typeof SobreRoute
   '/cartas/$id': typeof CartasIdRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/destacadas': typeof DestacadasRoute
   '/escribir': typeof EscribirRoute
   '/sobre': typeof SobreRoute
   '/cartas/$id': typeof CartasIdRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/destacadas': typeof DestacadasRoute
   '/escribir': typeof EscribirRoute
   '/sobre': typeof SobreRoute
   '/cartas/$id': typeof CartasIdRoute
@@ -75,13 +84,27 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/admin' | '/escribir' | '/sobre' | '/cartas/$id' | '/cartas/'
+    | '/'
+    | '/admin'
+    | '/destacadas'
+    | '/escribir'
+    | '/sobre'
+    | '/cartas/$id'
+    | '/cartas/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/escribir' | '/sobre' | '/cartas/$id' | '/cartas'
+  to:
+    | '/'
+    | '/admin'
+    | '/destacadas'
+    | '/escribir'
+    | '/sobre'
+    | '/cartas/$id'
+    | '/cartas'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/destacadas'
     | '/escribir'
     | '/sobre'
     | '/cartas/$id'
@@ -91,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  DestacadasRoute: typeof DestacadasRoute
   EscribirRoute: typeof EscribirRoute
   SobreRoute: typeof SobreRoute
   CartasIdRoute: typeof CartasIdRoute
@@ -111,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/escribir'
       fullPath: '/escribir'
       preLoaderRoute: typeof EscribirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/destacadas': {
+      id: '/destacadas'
+      path: '/destacadas'
+      fullPath: '/destacadas'
+      preLoaderRoute: typeof DestacadasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -147,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  DestacadasRoute: DestacadasRoute,
   EscribirRoute: EscribirRoute,
   SobreRoute: SobreRoute,
   CartasIdRoute: CartasIdRoute,
