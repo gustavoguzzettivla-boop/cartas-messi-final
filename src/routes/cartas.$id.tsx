@@ -116,7 +116,7 @@ function LetterDetail() {
 
         <div className="mt-10">
           <p className="font-serif text-xl leading-relaxed text-foreground sm:text-2xl">
-            Querido Leo,
+            Querido Leo:
           </p>
 
           <div className="mt-5 whitespace-pre-wrap font-serif text-lg leading-relaxed text-foreground/90 sm:text-xl sm:leading-loose">
