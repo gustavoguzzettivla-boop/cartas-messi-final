@@ -16,8 +16,8 @@ export const Route = createFileRoute("/")({
 function Index() {
 
   const lettersQuery = useQuery({
-    queryKey: ["letters", "latest", 8],
-    queryFn: () => fetchLetters(8),
+    queryKey: ["letters", "latest", 10],
+    queryFn: () => fetchLetters(10),
   });
 
 
