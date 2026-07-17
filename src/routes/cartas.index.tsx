@@ -37,7 +37,11 @@ function CartasPage() {
     queryFn: () => fetchLetters(10000),
   });
 
-  const letters = data ?? [];
+  const letters = [...(data ?? [])].sort(
+  (a, b) =>
+    new Date(b.created_at).getTime() -
+    new Date(a.created_at).getTime(),
+);
 
   const [q, setQ] = useState("");
   const [country, setCountry] = useState("");
@@ -294,10 +298,9 @@ function CartasPage() {
                 key={letter.id}
                 letter={letter}
                 number={
-                  (currentPage - 1) * PAGE_SIZE +
-                  index +
-                  1
-                }
+  letters.length -
+  ((currentPage - 1) * PAGE_SIZE + index)
+}
               />
             ))}
           </div>
